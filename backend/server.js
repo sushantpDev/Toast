@@ -17,21 +17,29 @@ connectDB();
 const app = express();
 
 // Middleware
+const ALLOWED_ORIGINS = [
+  process.env.CLIENT_URL,           // e.g. https://changebag.org (prod toast frontend)
+  'https://tollywoodreels.com',     // pshelfmerch production
+  'https://www.tollywoodreels.com',
+].filter(Boolean);
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, postman, curl)
+    // Allow requests with no origin (mobile apps, Postman, curl)
     if (!origin) return callback(null, true);
-    
-    // Allow any localhost origin (e.g. http://localhost:5173, 5174, 5175, 5176, etc.)
-    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+
+    // Allow any localhost origin in development
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))
+    ) {
       return callback(null, true);
     }
-    
-    const allowedOrigins = [process.env.CLIENT_URL || 'http://localhost:5173'];
-    if (allowedOrigins.includes(origin)) {
+
+    if (ALLOWED_ORIGINS.includes(origin)) {
       return callback(null, true);
     }
-    
+
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true

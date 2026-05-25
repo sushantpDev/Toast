@@ -15,9 +15,15 @@ const partnerApplicationSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a clientSecret'],
     },
+    // Legacy single-URI field (kept for DB compatibility)
     redirectUri: {
       type: String,
-      required: [true, 'Please add a redirectUri'],
+      default: null,
+    },
+    // Production-ready: multiple allowed redirect URIs (dev + production)
+    allowedRedirectUris: {
+      type: [String],
+      default: [],
     },
     isActive: {
       type: Boolean,

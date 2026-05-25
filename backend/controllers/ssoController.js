@@ -25,7 +25,12 @@ export const authorizeSSO = async (req, res) => {
       return res.status(400).json({ message: 'Partner application is inactive' });
     }
 
-    if (partner.redirectUri !== redirect_uri) {
+    // Support both new allowedRedirectUris array and legacy redirectUri string
+    const allowedUris = partner.allowedRedirectUris?.length
+      ? partner.allowedRedirectUris
+      : [partner.redirectUri];
+
+    if (!allowedUris.includes(redirect_uri)) {
       return res.status(400).json({ message: 'redirect_uri mismatch' });
     }
 
